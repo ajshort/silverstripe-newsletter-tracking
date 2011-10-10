@@ -6,6 +6,12 @@
  */
 class NewsletterTrackingExtension extends DataObjectDecorator {
 
+	public function extraStatics() {
+		return array('db' => array(
+			'Token' => 'Varchar(32)'
+		));
+	}
+
 	public function updateCMSFields(FieldSet $fields) {
 		$fields->replaceField('TrackedLinks', $tracked = new ComplexTableField(
 			$this->owner,
@@ -20,6 +26,13 @@ class NewsletterTrackingExtension extends DataObjectDecorator {
 			'"Visits" DESC'
 		));
 		$tracked->setPermissions(array('show'));
+	}
+
+	public function onBeforeWrite() {
+		if (!$this->owner->NewsletterTrackingToken) {
+			$generator = new RandomGenerator();
+			$this->owner->Token = $generator->generateHash('md5');
+		}
 	}
 
 }
