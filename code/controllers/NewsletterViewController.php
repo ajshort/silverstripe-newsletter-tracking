@@ -42,7 +42,11 @@ class NewsletterViewController extends Controller {
 			$this->httpError(404);
 		}
 
-		$newsletter->ViewedMembers()->add($user);
+		$view = new NewsletterView();
+		$view->IP           = $request->getIP();
+		$view->NewsletterID = $newsletter->ID;
+		$view->MemberID     = $user->ID;
+		$view->write();
 
 		$gif = '';
 

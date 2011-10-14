@@ -8,8 +8,8 @@ class NewsletterTrackingExtension extends DataObjectDecorator {
 
 	public function extraStatics() {
 		return array(
-			'db'        => array('Token' => 'Varchar(32)'),
-			'many_many' => array('ViewedMembers' => 'Member')
+			'db'       => array('Token' => 'Varchar(32)'),
+			'has_many' => array('Views' => 'NewsletterView')
 		);
 	}
 
@@ -28,23 +28,21 @@ class NewsletterTrackingExtension extends DataObjectDecorator {
 		));
 		$tracked->setPermissions(array('show'));
 
+		$viewers = new TableListField(
+			'Views',
+			'NewsletterView',
+			null,
+			'"NewsletterID" = ' . $this->owner->ID,
+			'"Created" DESC'
+		);
+		$viewers->setPermissions(array('show', 'export'));
+
 		$fields->addFieldsToTab('Root.ViewedBy', array(
-			new LiteralField('ViewedMembersNote', '<p>The viewed by list may '
-				. 'not be accurate, as many email clients block images used '
-				. 'for tracking by default.</p>'),
-			$viewers = new TableListField(
-				'ViewedMembers',
-				'Member',
-				array(
-					'Name'  => 'Name',
-					'Email' => 'Email'
-				),
-				'"NewsletterID" = ' . $this->owner->ID,
-				null,
-				'LEFT JOIN "Newsletter_ViewedMembers" ON "MemberID" = "Member"."ID"'
-			)
+			new LiteralField('ViewsNote', '<p>The viewed by list may not be '
+				. 'accurate, as many email clients block images used for '
+				. 'tracking by default.</p>'),
+			$viewers
 		));
-		$viewers->setPermissions(array('show'));
 	}
 
 	public function onBeforeWrite() {

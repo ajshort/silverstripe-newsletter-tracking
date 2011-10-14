@@ -59,7 +59,6 @@ class NewsletterLinkController extends Controller {
 
 		if ($user) {
 			$this->link->Newsletter()->ViewedMembers()->add($user);
-			$this->link->ViewedMembers()->add($user);
 		}
 
 		return $response;
