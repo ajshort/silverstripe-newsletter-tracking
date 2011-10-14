@@ -16,7 +16,7 @@ class NewsletterLinkController extends Controller {
 		'handleUserLink'
 	);
 
-	protected $link;
+	protected $view;
 
 	public function index() {
 		$this->httpError(404);
@@ -26,22 +26,20 @@ class NewsletterLinkController extends Controller {
 	 * Handles redirecting and tracking newsletter links without a user hash.
 	 */
 	public function handleLink($request) {
-		$this->link = DataObject::get_one('Newsletter_TrackedLink', sprintf(
+		$link = DataObject::get_one('Newsletter_TrackedLink', sprintf(
 			'"Hash" = \'%s\'', Convert::raw2sql($request->param('Hash'))
 		));
 
-		if (!$this->link) {
+		if (!$link) {
 			$this->httpError(404);
 		}
 
-		if (!Cookie::get("NewsletterLink-{$this->link->Hash}")) {
-			$this->link->Visits++;
-			$this->link->write();
+		$this->view = new NewsletterLinkView();
+		$this->view->IP     = $request->getIP();
+		$this->view->LinkID = $link->ID;
+		$this->view->write();
 
-			Cookie::set("NewsletterLink-{$this->link->Hash}", true);
-		}
-
-		return $this->redirect($this->link->Original, 301);
+		return $this->redirect($link->Original, 301);
 	}
 
 	/**
@@ -58,7 +56,8 @@ class NewsletterLinkController extends Controller {
 		));
 
 		if ($user) {
-			$this->link->Newsletter()->ViewedMembers()->add($user);
+			$this->view->MemberID = $user->ID;
+			$this->view->write();
 		}
 
 		return $response;

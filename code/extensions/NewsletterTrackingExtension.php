@@ -8,25 +8,25 @@ class NewsletterTrackingExtension extends DataObjectDecorator {
 
 	public function extraStatics() {
 		return array(
-			'db'       => array('Token' => 'Varchar(32)'),
-			'has_many' => array('Views' => 'NewsletterView')
+			'db'       => array(
+				'Token' => 'Varchar(32)'
+			),
+			'has_many' => array(
+				'Views'     => 'NewsletterView',
+				'LinkViews' => 'NewsletterLinkView'
+			)
 		);
 	}
 
 	public function updateCMSFields(FieldSet $fields) {
-		$fields->replaceField('TrackedLinks', $tracked = new ComplexTableField(
-			$this->owner,
-			'TrackedLinks',
-			'Newsletter_TrackedLink',
-			array(
-				'Original' => 'Link',
-				'Visits'   => 'Visits'
-			),
+		$fields->replaceField('TrackedLinks', $tracked = new TableListField(
+			'LinkViews',
+			'NewsletterLinkView',
 			null,
-			null,
-			'"Visits" DESC'
+			'"NewsletterID" = ' . $this->owner->ID,
+			'"Created" DESC'
 		));
-		$tracked->setPermissions(array('show'));
+		$tracked->setPermissions(array('show', 'export'));
 
 		$viewers = new TableListField(
 			'Views',
