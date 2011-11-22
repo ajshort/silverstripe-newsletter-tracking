@@ -46,7 +46,7 @@ class NewsletterTrackingExtension extends DataObjectDecorator {
 	}
 
 	public function onBeforeWrite() {
-		if (!$this->owner->NewsletterTrackingToken) {
+		if (!$this->owner->Token) {
 			$generator = new RandomGenerator();
 			$this->owner->Token = $generator->generateHash('md5');
 		}
