@@ -29,7 +29,7 @@ class NewsletterEmailViewTrackingExtension extends Extension {
 			"$member->NewsletterTrackingToken.gif"
 		));
 
-		if ($body) {
+		if ($pos) {
 			$body = substr($body, 0, $pos) . $img . substr($body, $pos);
 		} else {
 			$body .= $img;
