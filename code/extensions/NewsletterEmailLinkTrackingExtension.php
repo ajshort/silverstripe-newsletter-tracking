@@ -28,7 +28,10 @@ class NewsletterEmailLinkTrackingExtension extends Extension {
 		// along with the elements that link to them.
 		foreach ($body->getElementsByTagName('a') as $link) {
 			$href = $link->getAttribute('href');
-
+			if ((strpos($href, '{$') !== false) || (strpos($href, 'mailto:') !== false)) {
+				// ignore links with keywords
+				continue;
+			}
 			if (array_key_exists($href, $links)) {
 				$links[$href][] = $link;
 			} else {
@@ -71,7 +74,7 @@ class NewsletterEmailLinkTrackingExtension extends Extension {
 			}
 		}
 
-		$email->setBody(DBField::create('HTMLText', $body->getContent()));
+		$dom = $body->getDocument();
+		$email->setBody(DBField::create('HTMLText', $dom->saveHTML()));
 	}
-
 }
