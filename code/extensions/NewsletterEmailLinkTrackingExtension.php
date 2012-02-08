@@ -28,10 +28,17 @@ class NewsletterEmailLinkTrackingExtension extends Extension {
 		// along with the elements that link to them.
 		foreach ($body->getElementsByTagName('a') as $link) {
 			$href = $link->getAttribute('href');
+
+			// ignore links with keywords
 			if ((strpos($href, '{$') !== false) || (strpos($href, 'mailto:') !== false)) {
-				// ignore links with keywords
 				continue;
 			}
+
+			// ignore anchor links
+			if(strpos($href, '#') === 0) {
+				continue;
+			}
+
 			if (array_key_exists($href, $links)) {
 				$links[$href][] = $link;
 			} else {
