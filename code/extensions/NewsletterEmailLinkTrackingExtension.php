@@ -27,6 +27,10 @@ class NewsletterEmailLinkTrackingExtension extends Extension {
 		// First build up a set of all the unique links within the newsletter,
 		// along with the elements that link to them.
 		foreach ($body->getElementsByTagName('a') as $link) {
+			if(!$link->hasAttribute('href')) {
+				continue;
+			}
+
 			$href = $link->getAttribute('href');
 
 			// ignore links with keywords
